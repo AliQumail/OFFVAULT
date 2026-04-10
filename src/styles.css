@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+/* You can add global styles to this file, and also import other style files */
+
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background-color: #fff;
+  color: #111827;
+}
