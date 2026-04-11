@@ -1,0 +1,601 @@
+<div class="min-h-screen bg-white text-gray-900">
+
+  <!-- Background accents -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute -top-40 -right-40 w-[500px] h-[500px] bg-violet-100 rounded-full blur-3xl opacity-40"></div>
+    <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-fuchsia-100 rounded-full blur-3xl opacity-40"></div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="relative z-10 flex items-center justify-between px-6 md:px-16 py-6 border-b border-gray-200 bg-white/80 backdrop-blur-sm">
+    <a routerLink="/" class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+      <div class="w-10 h-10 bg-gradient-to-br from-red-500 to-red-700 rounded-xl flex items-center justify-center shadow-md shadow-red-200">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+        </svg>
+      </div>
+      <span class="text-xl font-black tracking-tight"><span class="text-red-600">OFF</span><span class="text-gray-900">VAULT</span></span>
+    </a>
+    <div class="flex items-center gap-3">
+      <a routerLink="/vault" class="px-5 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-full text-sm font-semibold transition-all duration-200 shadow-sm hover:-translate-y-0.5">
+        Open Vault
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="relative z-10 text-center px-6 pt-16 pb-12">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-violet-50 border border-violet-200 rounded-full text-violet-600 text-xs font-medium mb-6">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+      Complete User Guide
+    </div>
+    <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">How to use <span class="text-red-600">OFF</span>VAULT</h1>
+    <p class="text-lg text-gray-500 max-w-2xl mx-auto">Everything you need to know to manage your passwords securely, offline, and privately.</p>
+
+    <!-- Quick nav pills -->
+    <div class="flex flex-wrap justify-center gap-2 mt-8">
+      <a href="#open-vault" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors">1. Open Vault</a>
+      <a href="#add-entry" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors">2. Add Entry</a>
+      <a href="#edit-delete" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors">3. Edit &amp; Delete</a>
+      <a href="#password-tools" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors">4. Password Tools</a>
+      <a href="#export" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors">5. Export</a>
+      <a href="#import" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors">6. Import</a>
+      <a href="#security" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors">7. Security Keys</a>
+      <a href="#reset" class="px-4 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-sm font-medium transition-colors">8. Reset</a>
+    </div>
+  </section>
+
+  <div class="relative z-10 max-w-4xl mx-auto px-6 pb-24 space-y-16">
+
+    <!-- ── Step 1: Open Vault ─────────────────────────────────────────── -->
+    <section id="open-vault">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-violet-200 shrink-0">1</div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Opening the Vault</h2>
+          <p class="text-gray-500 text-sm mt-0.5">Navigate to your password vault from the home page.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+          <p>From the <strong class="text-gray-900">home page</strong>, click either button to open the vault:</p>
+          <ul class="space-y-2">
+            <li class="flex items-start gap-2">
+              <span class="w-5 h-5 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">A</span>
+              <span><strong class="text-gray-900">"Get Started"</strong> — large call-to-action button in the hero section.</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="w-5 h-5 bg-violet-100 text-violet-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">B</span>
+              <span><strong class="text-gray-900">"Open Vault"</strong> — top-right navigation link.</span>
+            </li>
+          </ul>
+          <p class="pt-1 text-gray-500">Your vault loads instantly — no login, no account, no waiting.</p>
+        </div>
+
+        <!-- Visual mockup: landing nav -->
+        <div class="bg-gray-50 border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+          <div class="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-100">
+            <div class="flex items-center gap-2">
+              <div class="w-7 h-7 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center">
+                <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+              </div>
+              <span class="text-sm font-black"><span class="text-red-600">OFF</span>VAULT</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 border border-gray-200 text-gray-500 rounded-full text-xs font-semibold">User Guide</span>
+              <span class="px-3 py-1 bg-gray-900 text-white rounded-full text-xs font-semibold ring-2 ring-violet-400 ring-offset-1">Open Vault ←</span>
+            </div>
+          </div>
+          <div class="px-4 py-6 text-center">
+            <p class="text-xs text-gray-400 mb-4">Your passwords, your control.</p>
+            <span class="inline-block px-5 py-2 bg-gray-900 text-white rounded-full text-xs font-semibold ring-2 ring-violet-400 ring-offset-1">Get Started →</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Step 2: Add Entry ──────────────────────────────────────────── -->
+    <section id="add-entry">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-fuchsia-500 to-fuchsia-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-fuchsia-200 shrink-0">2</div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Adding a New Entry</h2>
+          <p class="text-gray-500 text-sm mt-0.5">Store a new credential — username, password, and a note.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+          <ol class="space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-fuchsia-100 text-fuchsia-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+              <span>Click <strong class="text-gray-900">"Add Entry"</strong> in the top-right of the vault page. A blank row appears at the bottom of the table.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-fuchsia-100 text-fuchsia-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+              <span>Fill in the <strong class="text-gray-900">Key</strong> field — this is your username, email, or any label for this credential.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-fuchsia-100 text-fuchsia-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+              <span>Enter your <strong class="text-gray-900">Password</strong>. Use the <strong class="text-gray-900">⚡ Generate</strong> button to auto-create a strong random password.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-fuchsia-100 text-fuchsia-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
+              <span>Add an optional <strong class="text-gray-900">Description</strong> (e.g. "Netflix account" or "Work email").</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-fuchsia-100 text-fuchsia-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">5</span>
+              <span>Click the <strong class="text-gray-900">checkmark ✓</strong> button to save the row.</span>
+            </li>
+          </ol>
+          <p class="pt-1 bg-amber-50 border border-amber-100 rounded-xl px-3 py-2 text-amber-700 text-xs">Entries are saved automatically to your browser's local storage.</p>
+        </div>
+
+        <!-- Visual mockup: add row -->
+        <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+          <div class="px-4 py-3 bg-gray-50 border-b border-gray-100 flex items-center justify-between">
+            <span class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Vault</span>
+            <span class="px-3 py-1.5 bg-gray-900 text-white rounded-full text-xs font-semibold flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+              Add Entry
+            </span>
+          </div>
+          <div class="p-4 space-y-2">
+            <div class="flex gap-2">
+              <div class="flex-1 px-3 py-2 bg-gray-50 border-2 border-violet-400 rounded-lg text-xs text-gray-400">john&#64;example.com</div>
+              <div class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs font-mono text-gray-400">••••••••••</div>
+            </div>
+            <div class="flex gap-2">
+              <div class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-xs text-gray-400">Netflix account</div>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <button class="px-3 py-2 bg-violet-500 text-white rounded-lg text-xs font-semibold">✓ Save</button>
+                <button class="px-3 py-2 bg-gray-100 text-gray-500 rounded-lg text-xs font-semibold">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Step 3: Edit & Delete ─────────────────────────────────────── -->
+    <section id="edit-delete">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-sky-500 to-sky-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-sky-200 shrink-0">3</div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Editing &amp; Deleting Entries</h2>
+          <p class="text-gray-500 text-sm mt-0.5">Update or remove existing credentials at any time.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-4 text-sm text-gray-600 leading-relaxed">
+          <div>
+            <h3 class="font-bold text-gray-900 mb-1">To edit an entry:</h3>
+            <ol class="space-y-1.5">
+              <li class="flex items-start gap-2"><span class="text-sky-500 font-bold shrink-0">→</span> Hover over a row to reveal the action buttons.</li>
+              <li class="flex items-start gap-2"><span class="text-sky-500 font-bold shrink-0">→</span> Click the <strong class="text-gray-900">pencil ✏️</strong> icon to enter edit mode.</li>
+              <li class="flex items-start gap-2"><span class="text-sky-500 font-bold shrink-0">→</span> Modify the Key, Password or Description fields.</li>
+              <li class="flex items-start gap-2"><span class="text-sky-500 font-bold shrink-0">→</span> Click <strong class="text-gray-900">Save</strong> to confirm, or <strong class="text-gray-900">Cancel</strong> to discard changes.</li>
+            </ol>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 mb-1">To delete an entry:</h3>
+            <ol class="space-y-1.5">
+              <li class="flex items-start gap-2"><span class="text-red-500 font-bold shrink-0">→</span> Click the <strong class="text-gray-900">trash 🗑️</strong> icon on a row.</li>
+              <li class="flex items-start gap-2"><span class="text-red-500 font-bold shrink-0">→</span> A confirmation dialog appears. Click <strong class="text-red-600">Delete</strong> to permanently remove the entry.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- Visual mockup: action buttons row -->
+        <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+          <!-- Read-mode row -->
+          <div class="px-4 py-3 border-b border-gray-100 bg-gray-50/60 flex items-center justify-between gap-3">
+            <div class="flex-1 min-w-0">
+              <span class="text-sm font-medium text-gray-900 truncate block">john&#64;example.com</span>
+            </div>
+            <div class="flex-1">
+              <code class="text-sm font-mono text-gray-500">••••••••••</code>
+            </div>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <!-- Edit -->
+              <button class="p-1.5 bg-gray-100 hover:bg-violet-100 text-gray-500 hover:text-violet-600 rounded-lg transition-colors" title="Edit">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path></svg>
+              </button>
+              <!-- Delete -->
+              <button class="p-1.5 bg-gray-100 hover:bg-red-100 text-gray-500 hover:text-red-500 rounded-lg transition-colors" title="Delete">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+              </button>
+            </div>
+          </div>
+          <!-- Delete confirmation -->
+          <div class="p-4 text-center">
+            <div class="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-2">
+              <svg class="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <p class="text-xs font-bold text-gray-900 mb-1">Delete Entry?</p>
+            <p class="text-xs text-gray-400 mb-3">This action cannot be undone.</p>
+            <div class="flex gap-2 justify-center">
+              <button class="px-4 py-1.5 border border-gray-200 rounded-full text-xs font-semibold text-gray-600">Cancel</button>
+              <button class="px-4 py-1.5 bg-red-500 text-white rounded-full text-xs font-semibold">Delete</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Step 4: Password Tools ────────────────────────────────────── -->
+    <section id="password-tools">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-emerald-200 shrink-0">4</div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Password Tools</h2>
+          <p class="text-gray-500 text-sm mt-0.5">Reveal, copy, and generate passwords with one click.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-4">
+
+        <!-- Show/Hide -->
+        <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+          <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-1">Show / Hide</h3>
+          <p class="text-xs text-gray-500 leading-relaxed">Click the <strong class="text-gray-700">eye icon</strong> next to any password to toggle visibility. Passwords are hidden by default.</p>
+          <!-- Mini mockup -->
+          <div class="mt-3 flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+            <code class="text-xs font-mono text-gray-500 flex-1">••••••••••</code>
+            <button class="p-1 text-gray-400 hover:text-gray-600">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Copy -->
+        <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+          <div class="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-1">Copy to Clipboard</h3>
+          <p class="text-xs text-gray-500 leading-relaxed">Click the <strong class="text-gray-700">copy icon</strong> to instantly copy the password to your clipboard — no need to reveal it first.</p>
+          <!-- Mini mockup -->
+          <div class="mt-3 flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg">
+            <code class="text-xs font-mono text-gray-500 flex-1">••••••••••</code>
+            <button class="p-1 text-sky-500 bg-sky-50 rounded">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Generate -->
+        <div class="p-5 bg-white border border-gray-100 rounded-2xl shadow-sm">
+          <div class="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-5 h-5 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+          </div>
+          <h3 class="font-bold text-gray-900 mb-1">Generate Password</h3>
+          <p class="text-xs text-gray-500 leading-relaxed">While adding or editing an entry, click <strong class="text-gray-700">⚡ Generate</strong> to fill the password field with a cryptographically random 20-character password.</p>
+          <!-- Mini mockup -->
+          <div class="mt-3">
+            <button class="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-violet-50 border border-violet-200 text-violet-600 rounded-lg text-xs font-semibold">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              Generate
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Step 5: Export ─────────────────────────────────────────────── -->
+    <section id="export">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-orange-200 shrink-0">5</div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Exporting Your Vault</h2>
+          <p class="text-gray-500 text-sm mt-0.5">Save an encrypted backup of all your passwords to a file.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+          <ol class="space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+              <span>Click <strong class="text-gray-900">"Export"</strong> in the vault toolbar.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+              <span>Choose a <strong class="text-gray-900">format</strong>: <code class="bg-gray-100 px-1 rounded">.passlock</code>, <code class="bg-gray-100 px-1 rounded">.csv</code>, or <code class="bg-gray-100 px-1 rounded">.xlsx</code>. All three are encrypted — the format only affects how they're structured inside.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+              <span>Enter a <strong class="text-gray-900">Secret Key</strong> — a phrase or random string you'll remember.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
+              <span>Enter a <strong class="text-gray-900">Master Password</strong> — a separate password for a second layer of security.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">5</span>
+              <span>Click <strong class="text-gray-900">"Export as .passlock"</strong> — your browser downloads the encrypted file.</span>
+            </li>
+          </ol>
+          <div class="bg-red-50 border border-red-100 rounded-xl px-3 py-2.5 text-red-700 text-xs flex items-start gap-2">
+            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <span><strong>Important:</strong> Store your Secret Key and Master Password separately and safely. If you lose either one, the file cannot be decrypted.</span>
+          </div>
+        </div>
+
+        <!-- Visual mockup: export modal -->
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+            </div>
+            <span class="text-sm font-bold text-gray-900">Export Vault</span>
+          </div>
+          <div class="p-5 space-y-3">
+            <!-- Format selector -->
+            <div>
+              <p class="text-xs font-semibold text-gray-500 mb-1.5 uppercase tracking-wide">Format</p>
+              <div class="flex gap-1.5">
+                <span class="px-3 py-1 bg-gray-900 text-white rounded-full text-xs font-semibold">.passlock</span>
+                <span class="px-3 py-1 border border-gray-200 text-gray-500 rounded-full text-xs font-semibold">.csv</span>
+                <span class="px-3 py-1 border border-gray-200 text-gray-500 rounded-full text-xs font-semibold">.xlsx</span>
+              </div>
+            </div>
+            <!-- Secret key -->
+            <div>
+              <p class="text-xs font-semibold text-gray-700 mb-1">Secret Key</p>
+              <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-400">••••••••••••</div>
+            </div>
+            <!-- Master password -->
+            <div>
+              <p class="text-xs font-semibold text-gray-700 mb-1">Master Password</p>
+              <div class="px-3 py-2 bg-gray-50 border-2 border-violet-400 rounded-xl text-xs text-gray-400">••••••••</div>
+              <p class="text-xs text-gray-400 mt-1">Both keys are required to decrypt. Store them separately.</p>
+            </div>
+            <button class="w-full py-2.5 bg-gray-900 text-white rounded-full text-xs font-semibold">Export as .passlock</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Step 6: Import ─────────────────────────────────────────────── -->
+    <section id="import">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-teal-200 shrink-0">6</div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Importing Data</h2>
+          <p class="text-gray-500 text-sm mt-0.5">Load entries from a previously exported file.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+          <ol class="space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+              <span>Click <strong class="text-gray-900">"Import"</strong> in the vault toolbar.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+              <span>Click <strong class="text-gray-900">"Browse file…"</strong> and select your vault backup file (<code class="bg-gray-100 px-1 rounded">.passlock</code>, <code class="bg-gray-100 px-1 rounded">.csv</code>, or <code class="bg-gray-100 px-1 rounded">.xlsx</code>).</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+              <span>If the file is encrypted, enter your <strong class="text-gray-900">Secret Key</strong> and <strong class="text-gray-900">Master Password</strong> (the same ones used during export).</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">4</span>
+              <span>Click <strong class="text-gray-900">"Import"</strong> — only entries that don't already exist (matched by key) are added to your vault.</span>
+            </li>
+          </ol>
+          <div class="space-y-2">
+            <div class="bg-emerald-50 border border-emerald-100 rounded-xl px-3 py-2.5 text-emerald-700 text-xs flex items-start gap-2">
+              <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+              <span><strong>File Sync:</strong> When using a browser that supports the File System API (Chrome, Edge), selecting a file enables the <strong>Save</strong> button — changes sync directly back to the original file.</span>
+            </div>
+            <div class="bg-sky-50 border border-sky-100 rounded-xl px-3 py-2.5 text-sky-700 text-xs flex items-start gap-2">
+              <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              <span>Unencrypted <code>.csv</code> and <code>.xlsx</code> files can be imported directly without any keys.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visual mockup: import modal -->
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+          <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-3">
+            <div class="w-8 h-8 bg-violet-50 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+            </div>
+            <span class="text-sm font-bold text-gray-900">Import Entries</span>
+          </div>
+          <div class="p-5 space-y-3">
+            <!-- File selected -->
+            <div>
+              <p class="text-xs font-semibold text-gray-700 mb-1.5">Selected File</p>
+              <div class="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl">
+                <svg class="w-4 h-4 text-gray-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                <span class="text-xs text-gray-600 flex-1 truncate">vault-export.passlock</span>
+                <span class="inline-flex items-center gap-1 px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded-full text-xs font-medium">
+                  <svg class="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                  Encrypted
+                </span>
+              </div>
+            </div>
+            <!-- Secret key -->
+            <div>
+              <p class="text-xs font-semibold text-gray-700 mb-1">Secret Key</p>
+              <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-400">••••••••••••</div>
+            </div>
+            <!-- Master password -->
+            <div>
+              <p class="text-xs font-semibold text-gray-700 mb-1">Master Password</p>
+              <div class="px-3 py-2 bg-gray-50 border-2 border-violet-400 rounded-xl text-xs text-gray-400">••••••••</div>
+            </div>
+            <button class="w-full py-2.5 bg-gray-900 text-white rounded-full text-xs font-semibold">Import</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Step 7: Security Keys ─────────────────────────────────────── -->
+    <section id="security">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-red-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-red-200 shrink-0">7</div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Security: Dual-Key Encryption</h2>
+          <p class="text-gray-500 text-sm mt-0.5">How Secret Key + Master Password protect your data.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-4 text-sm text-gray-600 leading-relaxed">
+          <p>After export, your vault file is encrypted with <strong class="text-gray-900">AES-256-GCM</strong> — government-grade encryption. The encryption key is derived from <strong class="text-gray-900">both</strong> your inputs combined via PBKDF2 (100,000 iterations).</p>
+
+          <div class="space-y-2">
+            <div class="flex items-start gap-3 p-3 bg-violet-50 border border-violet-100 rounded-xl">
+              <svg class="w-5 h-5 text-violet-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"></path></svg>
+              <div>
+                <p class="font-semibold text-violet-800 mb-0.5">Secret Key</p>
+                <p class="text-xs text-violet-700">A memorable passphrase or random string. Think of it as the key to your vault.</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-center text-gray-400 text-lg font-bold">+</div>
+            <div class="flex items-start gap-3 p-3 bg-fuchsia-50 border border-fuchsia-100 rounded-xl">
+              <svg class="w-5 h-5 text-fuchsia-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+              <div>
+                <p class="font-semibold text-fuchsia-800 mb-0.5">Master Password</p>
+                <p class="text-xs text-fuchsia-700">A second independent password. Even if someone gets the Secret Key alone, they still can't decrypt.</p>
+              </div>
+            </div>
+            <div class="flex items-center justify-center text-gray-400 text-lg font-bold">↓</div>
+            <div class="flex items-start gap-3 p-3 bg-gray-900 rounded-xl">
+              <svg class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+              <div>
+                <p class="font-semibold text-white mb-0.5">AES-256-GCM Encrypted File</p>
+                <p class="text-xs text-gray-400">Unbreakable without both keys. Safe to store in cloud, email to yourself, or keep on a USB drive.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-amber-50 border border-amber-100 rounded-xl px-3 py-2.5 text-amber-700 text-xs">
+            <strong>Best practice:</strong> Store the Secret Key and Master Password in different locations — e.g. write one on paper, store the other in a different app.
+          </div>
+        </div>
+
+        <!-- Security diagram -->
+        <div class="p-5 bg-white border border-gray-200 rounded-2xl shadow-sm">
+          <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">How it works</p>
+          <div class="space-y-3">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-violet-100 text-violet-600 rounded-xl flex items-center justify-center text-xs font-mono font-bold shrink-0">K</div>
+              <div class="flex-1 h-1.5 bg-violet-200 rounded-full"></div>
+              <div class="w-8 h-8 bg-gray-900 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+              </div>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-fuchsia-100 text-fuchsia-600 rounded-xl flex items-center justify-center text-xs font-mono font-bold shrink-0">M</div>
+              <div class="flex-1 h-1.5 bg-fuchsia-200 rounded-full"></div>
+              <div class="w-8 h-8 bg-gray-900 rounded-xl flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+              </div>
+            </div>
+            <div class="ml-11 text-xs text-gray-400">PBKDF2 + SHA-256 (100k iterations)</div>
+            <div class="ml-11 flex items-center gap-2">
+              <div class="w-8 h-8 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xs font-bold shrink-0">256</div>
+              <span class="text-xs text-gray-500">bit symmetric key derived</span>
+            </div>
+            <div class="ml-11 flex items-center gap-2">
+              <div class="w-8 h-8 bg-gray-100 text-gray-600 rounded-xl flex items-center justify-center text-xs font-bold shrink-0">GCM</div>
+              <span class="text-xs text-gray-500">authenticated encryption applied</span>
+            </div>
+            <div class="ml-11 px-3 py-2 bg-gray-900 rounded-xl text-xs font-mono text-emerald-400 break-all">
+              OFV_SYNC_V1&nbsp;[encrypted blob]
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Step 8: Reset ──────────────────────────────────────────────── -->
+    <section id="reset">
+      <div class="flex items-center gap-4 mb-6">
+        <div class="w-12 h-12 bg-gradient-to-br from-rose-500 to-rose-600 rounded-2xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-rose-200 shrink-0">8</div>
+        <div>
+          <h2 class="text-2xl font-bold text-gray-900">Resetting the Vault</h2>
+          <p class="text-gray-500 text-sm mt-0.5">Permanently delete all stored entries and start fresh.</p>
+        </div>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 items-start">
+        <div class="space-y-3 text-sm text-gray-600 leading-relaxed">
+          <ol class="space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">1</span>
+              <span>Click the <strong class="text-gray-900">"Reset"</strong> button in the vault toolbar (trash icon).</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">2</span>
+              <span>A confirmation dialog shows how many entries will be deleted.</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="w-6 h-6 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center text-xs font-bold shrink-0 mt-0.5">3</span>
+              <span>Click <strong class="text-red-600">"Reset All"</strong> to permanently remove everything, or <strong class="text-gray-900">"Cancel"</strong> to go back.</span>
+            </li>
+          </ol>
+          <div class="bg-red-50 border border-red-100 rounded-xl px-3 py-2.5 text-red-700 text-xs flex items-start gap-2">
+            <svg class="w-4 h-4 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <span><strong>Warning:</strong> This action is irreversible and immediately clears all entries from browser storage. Export your vault first if you want a backup.</span>
+          </div>
+        </div>
+
+        <!-- Visual mockup: reset dialog -->
+        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6 text-center">
+          <div class="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-7 h-7 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+            </svg>
+          </div>
+          <p class="text-sm font-bold text-gray-900 mb-1">Reset Vault?</p>
+          <p class="text-xs text-gray-400 mb-4">This will permanently delete <strong class="text-gray-700">all 12 entries</strong> from your vault. This action cannot be undone.</p>
+          <div class="flex gap-2.5">
+            <button class="flex-1 py-2.5 border border-gray-200 rounded-full text-xs font-semibold text-gray-600">Cancel</button>
+            <button class="flex-1 py-2.5 bg-red-500 text-white rounded-full text-xs font-semibold">Reset All</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <div class="pt-4">
+      <div class="p-10 bg-gradient-to-br from-violet-50 to-fuchsia-50 border border-violet-100 rounded-3xl text-center">
+        <h2 class="text-2xl font-bold text-gray-900 mb-2">Ready to get started?</h2>
+        <p class="text-gray-500 text-sm mb-6">Your vault is waiting. Completely offline, completely private.</p>
+        <a routerLink="/vault" class="inline-block px-8 py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-full text-sm font-semibold transition-all duration-200 shadow-md shadow-gray-900/10 hover:-translate-y-0.5">
+          Open Your Vault &rarr;
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <footer class="relative z-10 px-6 md:px-16 py-8 border-t border-gray-100">
+    <div class="flex flex-col md:flex-row items-center justify-between text-sm text-gray-400">
+      <div class="flex items-center gap-2">
+        <div class="w-6 h-6 bg-gradient-to-br from-red-500 to-red-700 rounded-lg flex items-center justify-center">
+          <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+          </svg>
+        </div>
+        <span><span class="text-red-600 font-black">OFF</span><span class="font-black">VAULT</span></span>
+      </div>
+      <p class="mt-4 md:mt-0">Your data never leaves your browser. Ever.</p>
+    </div>
+  </footer>
+
+</div>

@@ -46,4 +46,9 @@ export class PasswordService {
     this.entries.update((list) => list.filter((e) => e.id !== id));
     this.save();
   }
+
+  clearAll(): void {
+    this.entries.set([]);
+    this.save();
+  }
 }

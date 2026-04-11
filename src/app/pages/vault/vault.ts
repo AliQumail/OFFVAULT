@@ -1,10 +1,13 @@
-import { Component, inject, signal, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy, viewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PasswordService } from '../../services/password';
 import { PasswordEntry } from '../../models/password-entry.model';
 
-const PASSLOCK_HEADER = 'PASSLOCK_ENCRYPTED_V1';
+const PASSLOCK_HEADER = 'OFV_SYNC_V1';
+const PASSLOCK_XLSX_HEADER = 'OFV_SYNC_XLSX_V1';
+const LEGACY_HEADER = 'PASSLOCK_ENCRYPTED_V1';
+const LEGACY_XLSX_HEADER = 'PASSLOCK_ENCRYPTED_XLSX_V1';
 
 interface EditState {
   key: string;
@@ -35,13 +38,35 @@ export class Vault {
   pendingRows = signal<PendingRow[]>([]);
   showPasswords = signal<Set<string>>(new Set());
 
+  // Tooltip
+  tooltipText = signal('');
+  tooltipPos = signal({ x: 0, y: 0 });
+  tooltipVisible = signal(false);
+
+  showTooltip(text: string, event: MouseEvent): void {
+    if (!text) return;
+    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = Math.max(8, Math.min(rect.left, window.innerWidth - 340));
+    this.tooltipText.set(text);
+    this.tooltipPos.set({ x, y: rect.bottom + 10 });
+    this.tooltipVisible.set(true);
+  }
+
+  hideTooltip(): void {
+    this.tooltipVisible.set(false);
+  }
+
   /** Max characters allowed in key / password / description fields. Edit this to change all inputs at once. */
-  readonly maxFieldLength = 75;
+  readonly maxFieldLength = 50;
 
   // Delete confirmation
   deleteConfirmId = signal<string | null>(null);
 
+  // Reset vault confirmation
+  resetVaultConfirmOpen = signal(false);
+
   // Import/Export modal
+  private readonly ioFileInputRef = viewChild<ElementRef<HTMLInputElement>>('ioFileInput');
   ioModalOpen = signal(false);
   ioModalMode = signal<'import' | 'export'>('export');
   ioSecretKey = signal('');
@@ -50,6 +75,29 @@ export class Vault {
   ioError = signal('');
   ioProcessing = signal(false);
   ioExportFormat = signal<'passlock' | 'csv' | 'xlsx'>('passlock');
+  ioMasterPassword = signal('');
+  ioIsLegacyFile = signal(false);
+  ioExportEncrypted = signal(true);
+  searchQuery = signal('');
+
+  // Active import source — tracks last imported file for one-click save
+  activeImportSource = signal<{ fileName: string; format: 'passlock' | 'csv' | 'xlsx'; secretKey: string; masterPassword: string; isLegacy: boolean; handle: FileSystemFileHandle | null } | null>(null);
+  private readonly savedEntriesSnapshot = signal('');
+  hasUnsavedChanges = computed(() => {
+    if (!this.activeImportSource()) return false;
+    return this.currentEntriesSnapshot() !== this.savedEntriesSnapshot();
+  });
+  readonly hasFsAccess = typeof window !== 'undefined' && 'showOpenFilePicker' in window;
+  ioSelectedFsHandle = signal<FileSystemFileHandle | null>(null);
+  isSaving = signal(false);
+
+  filteredEntries = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.entries();
+    return this.entries().filter(
+      e => e.key.toLowerCase().includes(q) || e.description.toLowerCase().includes(q)
+    );
+  });
 
   // ── Inline editing ──────────────────────────────────────────────────────────
 
@@ -138,6 +186,25 @@ export class Vault {
     this.deleteConfirmId.set(null);
   }
 
+  requestResetVault(): void {
+    this.resetVaultConfirmOpen.set(true);
+  }
+
+  confirmResetVault(): void {
+    this.passwordService.clearAll();
+    this.editingIds.set(new Set());
+    this.draftValues.set(new Map());
+    this.pendingRows.set([]);
+    this.showPasswords.set(new Set());
+    this.activeImportSource.set(null);
+    this.savedEntriesSnapshot.set('');
+    this.resetVaultConfirmOpen.set(false);
+  }
+
+  cancelResetVault(): void {
+    this.resetVaultConfirmOpen.set(false);
+  }
+
   // ── Password utilities ──────────────────────────────────────────────────────
 
   togglePasswordVisibility(id: string): void {
@@ -171,20 +238,66 @@ export class Vault {
 
   // ── Import / Export ─────────────────────────────────────────────────────────
 
+  async saveToActiveFile(): Promise<void> {
+    const source = this.activeImportSource();
+    if (!source || !this.hasUnsavedChanges() || this.isSaving()) return;
+    this.isSaving.set(true);
+    try {
+      const content = await this.buildExportContent(source.format, source.secretKey, source.masterPassword);
+      if (source.handle) {
+        // Write directly to the original file — no dialog
+        const writable = await source.handle.createWritable();
+        await writable.write(content);
+        await writable.close();
+      } else if (this.hasFsAccess) {
+        // First save via FS API — one-time dialog, then store handle for future saves
+        const ext = source.format === 'passlock' ? 'passlock' : source.format;
+        const newHandle: FileSystemFileHandle = await (window as any).showSaveFilePicker({
+          suggestedName: source.fileName,
+          types: [{ description: 'Vault file', accept: { 'text/plain': [`.${ext}`] } }],
+        });
+        const writable = await newHandle.createWritable();
+        await writable.write(content);
+        await writable.close();
+        this.activeImportSource.update(s => s ? { ...s, handle: newHandle } : null);
+      } else {
+        // Fallback: download with same filename
+        this.downloadFile(content, source.fileName, 'text/plain');
+      }
+      this.savedEntriesSnapshot.set(this.currentEntriesSnapshot());
+    } catch (e: unknown) {
+      // Ignore AbortError (user cancelled the save dialog)
+    } finally {
+      this.isSaving.set(false);
+    }
+  }
+
   openExportModal(): void {
     this.ioModalMode.set('export');
     this.ioSecretKey.set('');
+    this.ioMasterPassword.set('');
     this.ioError.set('');
     this.ioProcessing.set(false);
     this.ioExportFormat.set('passlock');
+    this.ioExportEncrypted.set(true);
     this.ioModalOpen.set(true);
+  }
+
+  setExportEncrypted(encrypted: boolean): void {
+    this.ioExportEncrypted.set(encrypted);
+    if (!encrypted && this.ioExportFormat() === 'passlock') {
+      this.ioExportFormat.set('csv');
+    }
   }
 
   openImportModal(): void {
     this.ioModalMode.set('import');
     this.ioSecretKey.set('');
+    this.ioMasterPassword.set('');
     this.ioSelectedFile.set(null);
+    this.ioSelectedFsHandle.set(null);
     this.ioIsEncryptedFile.set(false);
+    this.ioIsLegacyFile.set(false);
     this.ioError.set('');
     this.ioProcessing.set(false);
     this.ioModalOpen.set(true);
@@ -195,12 +308,58 @@ export class Vault {
     this.ioModalOpen.set(false);
   }
 
-  onFileSelected(event: Event): void {
+  async onFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0] ?? null;
     this.ioSelectedFile.set(file);
-    this.ioIsEncryptedFile.set(file?.name.toLowerCase().endsWith('.passlock') ?? false);
+    this.ioSelectedFsHandle.set(null); // regular input — no FS handle available
     this.ioError.set('');
+    if (file) {
+      const peek = await file.slice(0, 30).text();
+      const isLegacy = peek.startsWith(LEGACY_HEADER) || peek.startsWith(LEGACY_XLSX_HEADER);
+      this.ioIsEncryptedFile.set(
+        peek.startsWith(PASSLOCK_HEADER) || peek.startsWith(PASSLOCK_XLSX_HEADER) || isLegacy
+      );
+      this.ioIsLegacyFile.set(isLegacy);
+    } else {
+      this.ioIsEncryptedFile.set(false);
+      this.ioIsLegacyFile.set(false);
+    }
+  }
+
+  resetIoModal(): void {
+    this.ioSelectedFile.set(null);
+    this.ioSelectedFsHandle.set(null);
+    this.ioSecretKey.set('');
+    this.ioMasterPassword.set('');
+    this.ioError.set('');
+    this.ioIsEncryptedFile.set(false);
+    this.ioIsLegacyFile.set(false);
+    const input = this.ioFileInputRef()?.nativeElement;
+    if (input) input.value = '';
+  }
+
+  async pickFileWithFsAccess(): Promise<void> {
+    try {
+      const [handle]: FileSystemFileHandle[] = await (window as any).showOpenFilePicker({
+        types: [{ description: 'Vault files', accept: { 'text/plain': ['.passlock', '.csv', '.xlsx'] } }],
+        multiple: false,
+      });
+      const file = await handle.getFile();
+      this.ioSelectedFsHandle.set(handle);
+      this.ioSelectedFile.set(file);
+      this.ioError.set('');
+      const peek = await file.slice(0, 30).text();
+      const isLegacy = peek.startsWith(LEGACY_HEADER) || peek.startsWith(LEGACY_XLSX_HEADER);
+      this.ioIsEncryptedFile.set(
+        peek.startsWith(PASSLOCK_HEADER) || peek.startsWith(PASSLOCK_XLSX_HEADER) || isLegacy
+      );
+      this.ioIsLegacyFile.set(isLegacy);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name !== 'AbortError') {
+        this.ioError.set('Failed to open file.');
+      }
+    }
   }
 
   submitIoModal(): void {
@@ -213,28 +372,57 @@ export class Vault {
 
   async handleExport(): Promise<void> {
     const format = this.ioExportFormat();
-    this.ioProcessing.set(true);
-    this.ioError.set('');
-    try {
-      if (format === 'passlock') {
-        const secretKey = this.ioSecretKey().trim();
-        if (!secretKey) { this.ioError.set('Please enter a secret key.'); this.ioProcessing.set(false); return; }
-        const csv = this.buildCsv(this.entries());
-        const encrypted = await this.encryptText(csv, secretKey);
-        this.downloadFile(`${PASSLOCK_HEADER}\n${encrypted}`, 'vault-export.passlock', 'text/plain');
-      } else if (format === 'csv') {
-        const csv = this.buildCsv(this.entries());
-        this.downloadFile(csv, 'vault-export.csv', 'text/csv');
-      } else {
-        const data = await this.buildXlsx();
-        this.downloadBinary(data, 'vault-export.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    const isEncrypted = this.ioExportEncrypted();
+
+    if (isEncrypted) {
+      const secretKey = this.ioSecretKey().trim();
+      const masterPassword = this.ioMasterPassword().trim();
+      if (!secretKey) { this.ioError.set('Please enter a secret key.'); return; }
+      if (!masterPassword) { this.ioError.set('Please enter a master password.'); return; }
+      this.ioProcessing.set(true);
+      this.ioError.set('');
+      try {
+        const content = await this.buildExportContent(format, secretKey, masterPassword);
+        const ext = format === 'passlock' ? 'passlock' : format;
+        this.downloadFile(content, `vault-export.${ext}`, 'text/plain');
+        this.ioModalOpen.set(false);
+      } catch {
+        this.ioError.set('Export failed. Please try again.');
+      } finally {
+        this.ioProcessing.set(false);
       }
-      this.ioModalOpen.set(false);
-    } catch {
-      this.ioError.set('Export failed. Please try again.');
-    } finally {
-      this.ioProcessing.set(false);
+    } else {
+      // Raw (unprotected) export
+      this.ioProcessing.set(true);
+      this.ioError.set('');
+      try {
+        if (format === 'xlsx') {
+          const buffer = await this.buildXlsx();
+          this.downloadBinary(buffer, 'vault-export.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        } else {
+          const csv = this.buildCsv(this.entries());
+          this.downloadFile(csv, 'vault-export.csv', 'text/csv');
+        }
+        this.ioModalOpen.set(false);
+      } catch {
+        this.ioError.set('Export failed. Please try again.');
+      } finally {
+        this.ioProcessing.set(false);
+      }
     }
+  }
+
+  private async buildExportContent(format: 'passlock' | 'csv' | 'xlsx', secretKey: string, masterPassword: string): Promise<string> {
+    const effectiveKey = masterPassword + '\x00' + secretKey;
+    if (format === 'xlsx') {
+      const xlsxData = await this.buildXlsx();
+      const base64 = this.toBase64(new Uint8Array(xlsxData));
+      const encrypted = await this.encryptText(base64, effectiveKey);
+      return `${PASSLOCK_XLSX_HEADER}\n${encrypted}`;
+    }
+    const csv = this.buildCsv(this.entries());
+    const encrypted = await this.encryptText(csv, effectiveKey);
+    return `${PASSLOCK_HEADER}\n${encrypted}`;
   }
 
   async handleImport(): Promise<void> {
@@ -249,12 +437,24 @@ export class Vault {
       if (this.ioIsEncryptedFile()) {
         const secretKey = this.ioSecretKey().trim();
         if (!secretKey) { this.ioError.set('Please enter the secret key.'); this.ioProcessing.set(false); return; }
+        const isLegacy = this.ioIsLegacyFile();
+        const masterPassword = this.ioMasterPassword().trim();
+        if (!isLegacy && !masterPassword) { this.ioError.set('Please enter the master password.'); this.ioProcessing.set(false); return; }
+        const effectiveKey = isLegacy ? secretKey : masterPassword + '\x00' + secretKey;
         const text = await file.text();
         const nl = text.indexOf('\n');
-        if (nl === -1 || text.slice(0, nl).trim() !== PASSLOCK_HEADER) {
-          this.ioError.set('Invalid PassLock file.'); this.ioProcessing.set(false); return;
+        if (nl === -1) { this.ioError.set('Invalid encrypted file.'); this.ioProcessing.set(false); return; }
+        const fileHeader = text.slice(0, nl).trim();
+        const payload = text.slice(nl + 1).trim();
+        if (fileHeader === PASSLOCK_HEADER || fileHeader === LEGACY_HEADER) {
+          csvContent = await this.decryptText(payload, effectiveKey);
+        } else if (fileHeader === PASSLOCK_XLSX_HEADER || fileHeader === LEGACY_XLSX_HEADER) {
+          const decrypted = await this.decryptText(payload, effectiveKey);
+          const buffer = this.fromBase64(decrypted).buffer as ArrayBuffer;
+          csvContent = await this.xlsxBufferToCsv(buffer);
+        } else {
+          this.ioError.set('Invalid encrypted file.'); this.ioProcessing.set(false); return;
         }
-        csvContent = await this.decryptText(text.slice(nl + 1).trim(), secretKey);
       } else if (name.endsWith('.csv')) {
         csvContent = await file.text();
       } else if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
@@ -269,6 +469,21 @@ export class Vault {
       const newEntries = parsed.filter(e => !existingKeys.has(e.key.trim().toLowerCase()));
       if (newEntries.length === 0) { this.ioError.set('All entries already exist in your vault (matched by key). Nothing was imported.'); this.ioProcessing.set(false); return; }
       newEntries.forEach(e => this.passwordService.add({ ...e, source: 'imported' }));
+
+      // Track the import source for one-click save
+      const importedFormat: 'passlock' | 'csv' | 'xlsx' =
+        name.endsWith('.passlock') ? 'passlock' :
+        (name.endsWith('.xlsx') || name.endsWith('.xls')) ? 'xlsx' : 'csv';
+      this.activeImportSource.set({
+        fileName: file.name,
+        format: importedFormat,
+        secretKey: this.ioSecretKey().trim(),
+        masterPassword: this.ioMasterPassword().trim(),
+        isLegacy: this.ioIsLegacyFile(),
+        handle: this.ioSelectedFsHandle(),
+      });
+      this.savedEntriesSnapshot.set(this.currentEntriesSnapshot());
+
       this.ioModalOpen.set(false);
     } catch {
       this.ioError.set(
@@ -282,6 +497,10 @@ export class Vault {
   }
 
   // ── Private helpers ─────────────────────────────────────────────────────────
+
+  private currentEntriesSnapshot(): string {
+    return this.entries().map(e => `${e.key}\x00${e.password}\x00${e.description}`).join('\n');
+  }
 
   private buildCsv(entries: PasswordEntry[]): string {
     const rows: string[][] = [['key', 'password', 'description']];
@@ -299,7 +518,11 @@ export class Vault {
       .map(line => {
         const [key = '', password = '', description = ''] = this.parseCsvLine(line);
         if (!key.trim() || !password.trim()) return null;
-        return { key: key.trim(), password: password.trim(), description: description.trim() };
+        return {
+          key: key.trim().slice(0, this.maxFieldLength),
+          password: password.trim().slice(0, this.maxFieldLength),
+          description: description.trim().slice(0, this.maxFieldLength),
+        };
       })
       .filter((e): e is Omit<PasswordEntry, 'id' | 'createdAt' | 'updatedAt'> => e !== null);
   }
@@ -328,6 +551,12 @@ export class Vault {
   private async xlsxToCsv(file: File): Promise<string> {
     const XLSX = await import('xlsx');
     const buffer = await file.arrayBuffer();
+    const wb = XLSX.read(buffer, { type: 'array' });
+    return XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
+  }
+
+  private async xlsxBufferToCsv(buffer: ArrayBuffer): Promise<string> {
+    const XLSX = await import('xlsx');
     const wb = XLSX.read(buffer, { type: 'array' });
     return XLSX.utils.sheet_to_csv(wb.Sheets[wb.SheetNames[0]]);
   }

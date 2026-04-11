@@ -1,59 +1,58 @@
-# PassLock
+# OFFVAULT
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.7.
+A completely offline, browser-based password manager with AES-256-GCM encryption. No servers, no accounts, no tracking — your passwords never leave your device.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **100% Offline** — all data is stored in browser `localStorage`, no network calls ever made
+- **Zero data collection** — no telemetry, no accounts, no sign-up required
+- **AES-256-GCM encryption** — exports protected with PBKDF2 key derivation (100,000 iterations, SHA-256)
+- **Dual-key security** — Secret Key + Master Password both required to decrypt exported files
+- **Multiple export formats** — encrypted `.passlock`, `.csv`, or `.xlsx`; raw (unencrypted) export also available
+- **Real-time search** — filter entries instantly by key or description
+- **Password generator** — generate strong passwords with one click
+- **User Guide** — built-in help guide at `/guide`
+
+## Screenshots
+
+| Landing Page | Vault |
+|---|---|
+| ![Landing page](docs/screenshots/landing.png) | ![Vault view](docs/screenshots/vault.png) |
+
+## Getting Started
 
 ```bash
+npm install
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Open `http://localhost:4200` in your browser. No configuration needed.
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
+## Build
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Output is written to `dist/`. Production build is the default — output hashing and size budgets are enabled.
 
-## Running unit tests
+## Security Model
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+- Passwords are stored as plaintext in `localStorage` (protected by the browser's same-origin policy)
+- Exported files are encrypted with AES-256-GCM using a key derived from `masterPassword + '\x00' + secretKey` via PBKDF2
+- All cryptographic operations use the native **Web Crypto API** — no third-party crypto libraries
+- See [doc/TECHNICAL.md](doc/TECHNICAL.md) for full architecture and encryption specification
 
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+## Development
 
 ```bash
-ng e2e
+ng test     # unit tests via Vitest
+ng e2e      # end-to-end tests (framework not included by default)
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Tech Stack
 
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- **Angular 21** — standalone components, signals, `OnPush` change detection
+- **Tailwind CSS v4** — utility-first styling via PostCSS
+- **Web Crypto API** — AES-256-GCM + PBKDF2 (built into the browser)
+- **xlsx** — spreadsheet import/export (lazy-loaded, user-triggered only)
