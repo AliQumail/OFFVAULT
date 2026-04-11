@@ -95,6 +95,23 @@
           </button>
         </div>
 
+        <!-- Mobile Sync button -->
+        @if (activeImportSource()) {
+          <button
+            (click)="saveToActiveFile()"
+            [disabled]="!hasUnsavedChanges() || isSaving() || activeImportSource()?.isLegacy === true"
+            class="md:hidden flex items-center gap-2 px-4 py-2.5 border border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50 text-emerald-700 rounded-full text-sm font-semibold transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-emerald-200 disabled:hover:bg-transparent"
+            [title]="activeImportSource()?.isLegacy ? 'Legacy format — use Export to sync with dual-key security' : hasUnsavedChanges() ? 'Sync changes to ' + activeImportSource()!.fileName : 'No unsaved changes'"
+          >
+            @if (isSaving()) {
+              <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+            } @else {
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+            }
+            Sync
+          </button>
+        }
+
         <!-- Mobile three-dot menu -->
         <div class="relative md:hidden">
           <button
@@ -114,16 +131,6 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                 Reset
               </button>
-              @if (activeImportSource()) {
-                <button
-                  (click)="saveToActiveFile(); closeMoreMenu()"
-                  [disabled]="!hasUnsavedChanges() || isSaving() || activeImportSource()?.isLegacy === true"
-                  class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-emerald-700 hover:bg-emerald-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                  Sync
-                </button>
-              }
               <button
                 (click)="openImportModal(); closeMoreMenu()"
                 class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-gray-600 hover:bg-gray-50 transition-colors"
