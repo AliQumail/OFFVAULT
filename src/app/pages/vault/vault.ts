@@ -1,7 +1,7 @@
 import { Component, inject, signal, computed, ChangeDetectionStrategy, viewChild, ElementRef } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { PasswordService } from '../../services/password';
+import { PasswordService, ImportSource } from '../../services/password';
 import { PasswordEntry } from '../../models/password-entry.model';
 
 const PASSLOCK_HEADER = 'OFV_SYNC_V1';
@@ -65,6 +65,11 @@ export class Vault {
   // Reset vault confirmation
   resetVaultConfirmOpen = signal(false);
 
+  // Mobile more-menu dropdown
+  moreMenuOpen = signal(false);
+  toggleMoreMenu(): void { this.moreMenuOpen.update(v => !v); }
+  closeMoreMenu(): void { this.moreMenuOpen.set(false); }
+
   // Import/Export modal
   private readonly ioFileInputRef = viewChild<ElementRef<HTMLInputElement>>('ioFileInput');
   ioModalOpen = signal(false);
@@ -80,13 +85,9 @@ export class Vault {
   ioExportEncrypted = signal(true);
   searchQuery = signal('');
 
-  // Active import source — tracks last imported file for one-click save
-  activeImportSource = signal<{ fileName: string; format: 'passlock' | 'csv' | 'xlsx'; secretKey: string; masterPassword: string; isLegacy: boolean; handle: FileSystemFileHandle | null } | null>(null);
-  private readonly savedEntriesSnapshot = signal('');
-  hasUnsavedChanges = computed(() => {
-    if (!this.activeImportSource()) return false;
-    return this.currentEntriesSnapshot() !== this.savedEntriesSnapshot();
-  });
+  // Delegated to service — persists across navigation
+  activeImportSource = this.passwordService.activeImportSource;
+  hasUnsavedChanges = this.passwordService.hasUnsavedChanges;
   readonly hasFsAccess = typeof window !== 'undefined' && 'showOpenFilePicker' in window;
   ioSelectedFsHandle = signal<FileSystemFileHandle | null>(null);
   isSaving = signal(false);
@@ -196,8 +197,7 @@ export class Vault {
     this.draftValues.set(new Map());
     this.pendingRows.set([]);
     this.showPasswords.set(new Set());
-    this.activeImportSource.set(null);
-    this.savedEntriesSnapshot.set('');
+    this.passwordService.clearImportSource();
     this.resetVaultConfirmOpen.set(false);
   }
 
@@ -259,12 +259,12 @@ export class Vault {
         const writable = await newHandle.createWritable();
         await writable.write(content);
         await writable.close();
-        this.activeImportSource.update(s => s ? { ...s, handle: newHandle } : null);
+        this.passwordService.updateImportSourceHandle(newHandle);
       } else {
         // Fallback: download with same filename
         this.downloadFile(content, source.fileName, 'text/plain');
       }
-      this.savedEntriesSnapshot.set(this.currentEntriesSnapshot());
+      this.passwordService.markSaved();
     } catch (e: unknown) {
       // Ignore AbortError (user cancelled the save dialog)
     } finally {
@@ -428,6 +428,13 @@ export class Vault {
   async handleImport(): Promise<void> {
     const file = this.ioSelectedFile();
     if (!file) { this.ioError.set('Please select a file.'); return; }
+
+    // Block importing a different file when one is already active
+    const current = this.activeImportSource();
+    if (current && current.fileName.toLowerCase() !== file.name.toLowerCase()) {
+      this.ioError.set(`A file is already imported ("${current.fileName}"). Reset your vault first or re-import the same file.`);
+      return;
+    }
     this.ioProcessing.set(true);
     this.ioError.set('');
     try {
@@ -470,11 +477,11 @@ export class Vault {
       if (newEntries.length === 0) { this.ioError.set('All entries already exist in your vault (matched by key). Nothing was imported.'); this.ioProcessing.set(false); return; }
       newEntries.forEach(e => this.passwordService.add({ ...e, source: 'imported' }));
 
-      // Track the import source for one-click save
+      // Track the import source for one-click sync
       const importedFormat: 'passlock' | 'csv' | 'xlsx' =
         name.endsWith('.passlock') ? 'passlock' :
         (name.endsWith('.xlsx') || name.endsWith('.xls')) ? 'xlsx' : 'csv';
-      this.activeImportSource.set({
+      this.passwordService.setImportSource({
         fileName: file.name,
         format: importedFormat,
         secretKey: this.ioSecretKey().trim(),
@@ -482,7 +489,6 @@ export class Vault {
         isLegacy: this.ioIsLegacyFile(),
         handle: this.ioSelectedFsHandle(),
       });
-      this.savedEntriesSnapshot.set(this.currentEntriesSnapshot());
 
       this.ioModalOpen.set(false);
     } catch {
@@ -497,10 +503,6 @@ export class Vault {
   }
 
   // ── Private helpers ─────────────────────────────────────────────────────────
-
-  private currentEntriesSnapshot(): string {
-    return this.entries().map(e => `${e.key}\x00${e.password}\x00${e.description}`).join('\n');
-  }
 
   private buildCsv(entries: PasswordEntry[]): string {
     const rows: string[][] = [['key', 'password', 'description']];

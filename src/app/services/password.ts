@@ -1,13 +1,53 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, computed } from '@angular/core';
 import { PasswordEntry } from '../models/password-entry.model';
 
 const STORAGE_KEY = 'passlock_entries';
+
+export interface ImportSource {
+  fileName: string;
+  format: 'passlock' | 'csv' | 'xlsx';
+  secretKey: string;
+  masterPassword: string;
+  isLegacy: boolean;
+  handle: FileSystemFileHandle | null;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class PasswordService {
   readonly entries = signal<PasswordEntry[]>(this.load());
+
+  // Import source tracking — lives in service so it persists across navigation
+  readonly activeImportSource = signal<ImportSource | null>(null);
+  private readonly savedEntriesSnapshot = signal('');
+
+  private readonly currentEntriesSnapshot = computed(() =>
+    this.entries().map(e => `${e.key}\x00${e.password}\x00${e.description}`).join('\n')
+  );
+
+  readonly hasUnsavedChanges = computed(() => {
+    if (!this.activeImportSource()) return false;
+    return this.currentEntriesSnapshot() !== this.savedEntriesSnapshot();
+  });
+
+  setImportSource(source: ImportSource): void {
+    this.activeImportSource.set(source);
+    this.savedEntriesSnapshot.set(this.currentEntriesSnapshot());
+  }
+
+  markSaved(): void {
+    this.savedEntriesSnapshot.set(this.currentEntriesSnapshot());
+  }
+
+  clearImportSource(): void {
+    this.activeImportSource.set(null);
+    this.savedEntriesSnapshot.set('');
+  }
+
+  updateImportSourceHandle(handle: FileSystemFileHandle): void {
+    this.activeImportSource.update(s => s ? { ...s, handle } : null);
+  }
 
   private load(): PasswordEntry[] {
     const raw = localStorage.getItem(STORAGE_KEY);
