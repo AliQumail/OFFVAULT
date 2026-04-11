@@ -2,7 +2,8 @@
 
 A completely offline, browser-based password manager with AES-256-GCM encryption. No servers, no accounts, no tracking — your passwords never leave your device.
 
-![OFFVAULT](src/assets/offvault.png)
+<img width="731" height="416" alt="image" src="https://github.com/user-attachments/assets/eefbbcdf-20e5-4edf-893e-916a3eccaf85" />
+
 
 ## Features
 
