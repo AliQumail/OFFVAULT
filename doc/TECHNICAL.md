@@ -84,8 +84,6 @@ interface PasswordEntry {
 All entries are serialised as a single JSON array under one key:
 
 ```
-localStorage["passlock_entries"] = JSON.stringify(PasswordEntry[])
-```
 
 No other keys are written to `localStorage`.
 

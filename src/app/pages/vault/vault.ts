@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed, ChangeDetectionStrategy, viewChild, ElementRef } from '@angular/core';
+import { Component, inject, signal, computed, ChangeDetectionStrategy, viewChild, ElementRef, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PasswordService, ImportSource } from '../../services/password';
@@ -6,8 +6,6 @@ import { PasswordEntry } from '../../models/password-entry.model';
 
 const PASSLOCK_HEADER = 'OFV_SYNC_V1';
 const PASSLOCK_XLSX_HEADER = 'OFV_SYNC_XLSX_V1';
-const LEGACY_HEADER = 'PASSLOCK_ENCRYPTED_V1';
-const LEGACY_XLSX_HEADER = 'PASSLOCK_ENCRYPTED_XLSX_V1';
 
 interface EditState {
   key: string;
@@ -29,7 +27,7 @@ interface PendingRow {
   styleUrl: './vault.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class Vault {
+export class Vault implements OnInit {
   private readonly passwordService = inject(PasswordService);
 
   entries = this.passwordService.entries;
@@ -70,6 +68,12 @@ export class Vault {
   toggleMoreMenu(): void { this.moreMenuOpen.update(v => !v); }
   closeMoreMenu(): void { this.moreMenuOpen.set(false); }
 
+  async ngOnInit(): Promise<void> {
+    if (this.entries().length === 0) {
+      await this.passwordService.loadFromStorage();
+    }
+  }
+
   // Import/Export modal
   private readonly ioFileInputRef = viewChild<ElementRef<HTMLInputElement>>('ioFileInput');
   ioModalOpen = signal(false);
@@ -81,7 +85,6 @@ export class Vault {
   ioProcessing = signal(false);
   ioExportFormat = signal<'passlock' | 'csv' | 'xlsx'>('passlock');
   ioMasterPassword = signal('');
-  ioIsLegacyFile = signal(false);
   ioExportEncrypted = signal(true);
   searchQuery = signal('');
 
@@ -297,7 +300,6 @@ export class Vault {
     this.ioSelectedFile.set(null);
     this.ioSelectedFsHandle.set(null);
     this.ioIsEncryptedFile.set(false);
-    this.ioIsLegacyFile.set(false);
     this.ioError.set('');
     this.ioProcessing.set(false);
     this.ioModalOpen.set(true);
@@ -316,14 +318,11 @@ export class Vault {
     this.ioError.set('');
     if (file) {
       const peek = await file.slice(0, 30).text();
-      const isLegacy = peek.startsWith(LEGACY_HEADER) || peek.startsWith(LEGACY_XLSX_HEADER);
       this.ioIsEncryptedFile.set(
-        peek.startsWith(PASSLOCK_HEADER) || peek.startsWith(PASSLOCK_XLSX_HEADER) || isLegacy
+        peek.startsWith(PASSLOCK_HEADER) || peek.startsWith(PASSLOCK_XLSX_HEADER)
       );
-      this.ioIsLegacyFile.set(isLegacy);
     } else {
       this.ioIsEncryptedFile.set(false);
-      this.ioIsLegacyFile.set(false);
     }
   }
 
@@ -334,7 +333,6 @@ export class Vault {
     this.ioMasterPassword.set('');
     this.ioError.set('');
     this.ioIsEncryptedFile.set(false);
-    this.ioIsLegacyFile.set(false);
     const input = this.ioFileInputRef()?.nativeElement;
     if (input) input.value = '';
   }
@@ -350,11 +348,9 @@ export class Vault {
       this.ioSelectedFile.set(file);
       this.ioError.set('');
       const peek = await file.slice(0, 30).text();
-      const isLegacy = peek.startsWith(LEGACY_HEADER) || peek.startsWith(LEGACY_XLSX_HEADER);
       this.ioIsEncryptedFile.set(
-        peek.startsWith(PASSLOCK_HEADER) || peek.startsWith(PASSLOCK_XLSX_HEADER) || isLegacy
+        peek.startsWith(PASSLOCK_HEADER) || peek.startsWith(PASSLOCK_XLSX_HEADER)
       );
-      this.ioIsLegacyFile.set(isLegacy);
     } catch (e: unknown) {
       if (e instanceof Error && e.name !== 'AbortError') {
         this.ioError.set('Failed to open file.');
@@ -444,18 +440,17 @@ export class Vault {
       if (this.ioIsEncryptedFile()) {
         const secretKey = this.ioSecretKey().trim();
         if (!secretKey) { this.ioError.set('Please enter the secret key.'); this.ioProcessing.set(false); return; }
-        const isLegacy = this.ioIsLegacyFile();
         const masterPassword = this.ioMasterPassword().trim();
-        if (!isLegacy && !masterPassword) { this.ioError.set('Please enter the master password.'); this.ioProcessing.set(false); return; }
-        const effectiveKey = isLegacy ? secretKey : masterPassword + '\x00' + secretKey;
+        if (!masterPassword) { this.ioError.set('Please enter the master password.'); this.ioProcessing.set(false); return; }
+        const effectiveKey = masterPassword + '\x00' + secretKey;
         const text = await file.text();
         const nl = text.indexOf('\n');
         if (nl === -1) { this.ioError.set('Invalid encrypted file.'); this.ioProcessing.set(false); return; }
         const fileHeader = text.slice(0, nl).trim();
         const payload = text.slice(nl + 1).trim();
-        if (fileHeader === PASSLOCK_HEADER || fileHeader === LEGACY_HEADER) {
+        if (fileHeader === PASSLOCK_HEADER) {
           csvContent = await this.decryptText(payload, effectiveKey);
-        } else if (fileHeader === PASSLOCK_XLSX_HEADER || fileHeader === LEGACY_XLSX_HEADER) {
+        } else if (fileHeader === PASSLOCK_XLSX_HEADER) {
           const decrypted = await this.decryptText(payload, effectiveKey);
           const buffer = this.fromBase64(decrypted).buffer as ArrayBuffer;
           csvContent = await this.xlsxBufferToCsv(buffer);
@@ -475,6 +470,9 @@ export class Vault {
       const existingKeys = new Set(this.entries().map(e => e.key.trim().toLowerCase()));
       const newEntries = parsed.filter(e => !existingKeys.has(e.key.trim().toLowerCase()));
       if (newEntries.length === 0) { this.ioError.set('All entries already exist in your vault (matched by key). Nothing was imported.'); this.ioProcessing.set(false); return; }
+      if (this.ioIsEncryptedFile()) {
+        await this.passwordService.persistVaultKey(this.ioMasterPassword().trim() + '\x00' + this.ioSecretKey().trim());
+      }
       newEntries.forEach(e => this.passwordService.add({ ...e, source: 'imported' }));
 
       // Track the import source for one-click sync
@@ -486,7 +484,6 @@ export class Vault {
         format: importedFormat,
         secretKey: this.ioSecretKey().trim(),
         masterPassword: this.ioMasterPassword().trim(),
-        isLegacy: this.ioIsLegacyFile(),
         handle: this.ioSelectedFsHandle(),
       });
 
@@ -494,7 +491,7 @@ export class Vault {
     } catch {
       this.ioError.set(
         this.ioIsEncryptedFile()
-          ? 'Decryption failed. Check your secret key and try again.'
+          ? 'Decryption failed. Check your credentials and try again.'
           : 'Failed to parse file. Check the format and try again.'
       );
     } finally {
