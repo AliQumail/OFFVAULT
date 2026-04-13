@@ -101,7 +101,7 @@ export class PasswordService {
       createdAt: now,
       updatedAt: now,
     };
-    this.entries.update((list) => [...list, newEntry]);
+    this.entries.update((list) => [newEntry, ...list]);
     this.scheduleSave();
   }
 

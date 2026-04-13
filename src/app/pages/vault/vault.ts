@@ -223,18 +223,6 @@ export class Vault implements OnInit {
     return this.showPasswords().has(id);
   }
 
-  generatePassword(context: { id?: string; tmpId?: string }): void {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()_+-=';
-    const array = new Uint32Array(20);
-    crypto.getRandomValues(array);
-    const password = Array.from(array, v => chars[v % chars.length]).join('');
-    if (context.id) {
-      this.updateDraft(context.id, 'password', password);
-    } else if (context.tmpId) {
-      this.updatePendingRow(context.tmpId, 'password', password);
-    }
-  }
-
   copyToClipboard(text: string): void {
     navigator.clipboard.writeText(text);
   }
