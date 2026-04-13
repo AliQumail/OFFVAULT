@@ -11,7 +11,7 @@ A completely offline, browser-based password manager with AES-256-GCM encryption
 - **Zero data collection** — no telemetry, no accounts, no sign-up required
 - **AES-256-GCM encryption** — exports protected with PBKDF2 key derivation (100,000 iterations, SHA-256)
 - **Dual-key security** — Secret Key + Master Password both required to decrypt exported files
-- **Multiple export formats** — encrypted `.passlock`, `.csv`, or `.xlsx`; raw (unencrypted) export also available
+- **Multiple export formats** — encrypted `.offvault`, `.csv`, or `.xlsx`; raw (unencrypted) export also available
 - **Real-time search** — filter entries instantly by key or description
 - **Password generator** — generate strong passwords with one click
 - **User Guide** — built-in help guide at `/guide`

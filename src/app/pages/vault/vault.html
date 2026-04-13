@@ -479,11 +479,11 @@
         </div>
         <p class="text-sm text-gray-500 mb-6 pl-13">
           @if (ioModalMode() === 'import') {
-            Accepts <code class="bg-gray-100 px-1 rounded">.passlock</code>, <code class="bg-gray-100 px-1 rounded">.csv</code>, or <code class="bg-gray-100 px-1 rounded">.xlsx</code> files. Encrypted files require a secret key and master password.
+            Accepts <code class="bg-gray-100 px-1 rounded">.offvault</code>, <code class="bg-gray-100 px-1 rounded">.csv</code>, or <code class="bg-gray-100 px-1 rounded">.xlsx</code> files. Encrypted files require a secret key and master password.
           } @else if (!ioExportEncrypted()) {
             <span class="text-amber-600 font-medium">⚠ Raw export</span> — passwords are saved as plain text with no encryption. Only use this for trusted local backups.
-          } @else if (ioExportFormat() === 'passlock') {
-            Encrypted with <strong>AES-256-GCM</strong> and saved as a <code class="bg-gray-100 px-1 rounded">.passlock</code> file. Keep your secret key and master password safe.
+          } @else if (ioExportFormat() === 'offvault') {
+            Encrypted with <strong>AES-256-GCM</strong> and saved as a <code class="bg-gray-100 px-1 rounded">.offvault</code> file. Keep your secret key and master password safe.
           } @else if (ioExportFormat() === 'csv') {
             CSV data encrypted with <strong>AES-256-GCM</strong>. Requires your secret key and master password to re-import.
           } @else {
@@ -497,9 +497,9 @@
             <label class="block text-sm font-semibold text-gray-700 mb-2">Format</label>
             <div class="flex gap-2">
               @if (ioExportEncrypted()) {
-                <button type="button" (click)="ioExportFormat.set('passlock')"
-                  [class]="ioExportFormat() === 'passlock' ? 'px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-semibold transition-all' : 'px-4 py-2 border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full text-sm font-semibold transition-all'">
-                  .passlock
+                <button type="button" (click)="ioExportFormat.set('offvault')"
+                  [class]="ioExportFormat() === 'offvault' ? 'px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-semibold transition-all' : 'px-4 py-2 border border-gray-200 hover:border-gray-300 text-gray-600 rounded-full text-sm font-semibold transition-all'">
+                  .offvault
                 </button>
               }
               <button type="button" (click)="ioExportFormat.set('csv')"
@@ -546,7 +546,7 @@
               <input
                 #ioFileInput
                 type="file"
-                accept=".passlock,.csv,.xlsx,.xls"
+                accept=".offvault,.csv,.xlsx,.xls"
                 (change)="onFileSelected($event)"
                 class="block w-full text-sm text-gray-600 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-violet-600 hover:file:bg-violet-100 transition-colors cursor-pointer"
               />

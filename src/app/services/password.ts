@@ -6,7 +6,7 @@ const SESSION_VAULT_KEY = 'passlock_vault_key';
 
 export interface ImportSource {
   fileName: string;
-  format: 'passlock' | 'csv' | 'xlsx';
+  format: 'offvault' | 'csv' | 'xlsx';
   secretKey: string;
   masterPassword: string;
   handle: FileSystemFileHandle | null;
@@ -20,7 +20,6 @@ export class PasswordService {
   private vaultKey!: string;
 
   constructor() {
-    localStorage.removeItem('passlock_entries');
     const stored = sessionStorage.getItem(SESSION_VAULT_KEY);
     if (stored) {
       this.vaultKey = stored;

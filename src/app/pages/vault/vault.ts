@@ -4,8 +4,8 @@ import { RouterLink } from '@angular/router';
 import { PasswordService, ImportSource } from '../../services/password';
 import { PasswordEntry } from '../../models/password-entry.model';
 
-const PASSLOCK_HEADER = 'OFV_SYNC_V1';
-const PASSLOCK_XLSX_HEADER = 'OFV_SYNC_XLSX_V1';
+const OFFVAULT_HEADER = 'OFV_SYNC_V1';
+const OFFVAULT_XLSX_HEADER = 'OFV_SYNC_XLSX_V1';
 
 interface EditState {
   key: string;
@@ -83,7 +83,7 @@ export class Vault implements OnInit {
   ioIsEncryptedFile = signal(false);
   ioError = signal('');
   ioProcessing = signal(false);
-  ioExportFormat = signal<'passlock' | 'csv' | 'xlsx'>('passlock');
+  ioExportFormat = signal<'offvault' | 'csv' | 'xlsx'>('offvault');
   ioMasterPassword = signal('');
   ioExportEncrypted = signal(true);
   searchQuery = signal('');
@@ -145,8 +145,8 @@ export class Vault implements OnInit {
 
   addPendingRow(): void {
     this.pendingRows.update(rows => [
-      ...rows,
       { tmpId: crypto.randomUUID(), key: '', password: '', description: '' },
+      ...rows,
     ]);
   }
 
@@ -254,7 +254,7 @@ export class Vault implements OnInit {
         await writable.close();
       } else if (this.hasFsAccess) {
         // First save via FS API — one-time dialog, then store handle for future saves
-        const ext = source.format === 'passlock' ? 'passlock' : source.format;
+        const ext = source.format === 'offvault' ? 'offvault' : source.format;
         const newHandle: FileSystemFileHandle = await (window as any).showSaveFilePicker({
           suggestedName: source.fileName,
           types: [{ description: 'Vault file', accept: { 'text/plain': [`.${ext}`] } }],
@@ -281,14 +281,14 @@ export class Vault implements OnInit {
     this.ioMasterPassword.set('');
     this.ioError.set('');
     this.ioProcessing.set(false);
-    this.ioExportFormat.set('passlock');
+    this.ioExportFormat.set('offvault');
     this.ioExportEncrypted.set(true);
     this.ioModalOpen.set(true);
   }
 
   setExportEncrypted(encrypted: boolean): void {
     this.ioExportEncrypted.set(encrypted);
-    if (!encrypted && this.ioExportFormat() === 'passlock') {
+    if (!encrypted && this.ioExportFormat() === 'offvault') {
       this.ioExportFormat.set('csv');
     }
   }
@@ -319,7 +319,7 @@ export class Vault implements OnInit {
     if (file) {
       const peek = await file.slice(0, 30).text();
       this.ioIsEncryptedFile.set(
-        peek.startsWith(PASSLOCK_HEADER) || peek.startsWith(PASSLOCK_XLSX_HEADER)
+        peek.startsWith(OFFVAULT_HEADER) || peek.startsWith(OFFVAULT_XLSX_HEADER)
       );
     } else {
       this.ioIsEncryptedFile.set(false);
@@ -340,7 +340,7 @@ export class Vault implements OnInit {
   async pickFileWithFsAccess(): Promise<void> {
     try {
       const [handle]: FileSystemFileHandle[] = await (window as any).showOpenFilePicker({
-        types: [{ description: 'Vault files', accept: { 'text/plain': ['.passlock', '.csv', '.xlsx'] } }],
+        types: [{ description: 'Vault files', accept: { 'text/plain': ['.offvault', '.csv', '.xlsx'] } }],
         multiple: false,
       });
       const file = await handle.getFile();
@@ -349,7 +349,7 @@ export class Vault implements OnInit {
       this.ioError.set('');
       const peek = await file.slice(0, 30).text();
       this.ioIsEncryptedFile.set(
-        peek.startsWith(PASSLOCK_HEADER) || peek.startsWith(PASSLOCK_XLSX_HEADER)
+        peek.startsWith(OFFVAULT_HEADER) || peek.startsWith(OFFVAULT_XLSX_HEADER)
       );
     } catch (e: unknown) {
       if (e instanceof Error && e.name !== 'AbortError') {
@@ -379,7 +379,7 @@ export class Vault implements OnInit {
       this.ioError.set('');
       try {
         const content = await this.buildExportContent(format, secretKey, masterPassword);
-        const ext = format === 'passlock' ? 'passlock' : format;
+        const ext = format === 'offvault' ? 'offvault' : format;
         this.downloadFile(content, `vault-export.${ext}`, 'text/plain');
         this.ioModalOpen.set(false);
       } catch {
@@ -408,17 +408,17 @@ export class Vault implements OnInit {
     }
   }
 
-  private async buildExportContent(format: 'passlock' | 'csv' | 'xlsx', secretKey: string, masterPassword: string): Promise<string> {
+  private async buildExportContent(format: 'offvault' | 'csv' | 'xlsx', secretKey: string, masterPassword: string): Promise<string> {
     const effectiveKey = masterPassword + '\x00' + secretKey;
     if (format === 'xlsx') {
       const xlsxData = await this.buildXlsx();
       const base64 = this.toBase64(new Uint8Array(xlsxData));
       const encrypted = await this.encryptText(base64, effectiveKey);
-      return `${PASSLOCK_XLSX_HEADER}\n${encrypted}`;
+      return `${OFFVAULT_XLSX_HEADER}\n${encrypted}`;
     }
     const csv = this.buildCsv(this.entries());
     const encrypted = await this.encryptText(csv, effectiveKey);
-    return `${PASSLOCK_HEADER}\n${encrypted}`;
+    return `${OFFVAULT_HEADER}\n${encrypted}`;
   }
 
   async handleImport(): Promise<void> {
@@ -448,9 +448,9 @@ export class Vault implements OnInit {
         if (nl === -1) { this.ioError.set('Invalid encrypted file.'); this.ioProcessing.set(false); return; }
         const fileHeader = text.slice(0, nl).trim();
         const payload = text.slice(nl + 1).trim();
-        if (fileHeader === PASSLOCK_HEADER) {
+        if (fileHeader === OFFVAULT_HEADER) {
           csvContent = await this.decryptText(payload, effectiveKey);
-        } else if (fileHeader === PASSLOCK_XLSX_HEADER) {
+        } else if (fileHeader === OFFVAULT_XLSX_HEADER) {
           const decrypted = await this.decryptText(payload, effectiveKey);
           const buffer = this.fromBase64(decrypted).buffer as ArrayBuffer;
           csvContent = await this.xlsxBufferToCsv(buffer);
@@ -462,7 +462,7 @@ export class Vault implements OnInit {
       } else if (name.endsWith('.xlsx') || name.endsWith('.xls')) {
         csvContent = await this.xlsxToCsv(file);
       } else {
-        this.ioError.set('Unsupported format. Use .passlock, .csv, or .xlsx'); this.ioProcessing.set(false); return;
+        this.ioError.set('Unsupported format. Use .offvault, .csv, or .xlsx'); this.ioProcessing.set(false); return;
       }
 
       const parsed = this.parseCsv(csvContent);
@@ -476,8 +476,8 @@ export class Vault implements OnInit {
       newEntries.forEach(e => this.passwordService.add({ ...e, source: 'imported' }));
 
       // Track the import source for one-click sync
-      const importedFormat: 'passlock' | 'csv' | 'xlsx' =
-        name.endsWith('.passlock') ? 'passlock' :
+      const importedFormat: 'offvault' | 'csv' | 'xlsx' =
+        name.endsWith('.offvault') ? 'offvault' :
         (name.endsWith('.xlsx') || name.endsWith('.xls')) ? 'xlsx' : 'csv';
       this.passwordService.setImportSource({
         fileName: file.name,

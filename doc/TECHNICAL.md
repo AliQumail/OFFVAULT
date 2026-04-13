@@ -21,7 +21,7 @@ OFFVAULT is a single-page Angular application. All data lives in the user's brow
 ```
 Browser
   └─ Angular SPA (standalone components, signals, OnPush)
-       ├─ PasswordService  ←──→  localStorage  (key: "passlock_entries")
+       ├─ PasswordService  ←──→  localStorage  (key: "SESSION_VAULT_KEY)" // Stored encrypted data locally 
        └─ Web Crypto API   ←──→  AES-256-GCM + PBKDF2
 ```
 
@@ -82,10 +82,6 @@ interface PasswordEntry {
 ### `localStorage` schema
 
 All entries are serialised as a single JSON array under one key:
-
-```
-
-No other keys are written to `localStorage`.
 
 ---
 
@@ -173,7 +169,7 @@ plain = AES-256-GCM.decrypt(cipher, key, iv)
 
 ## 6. File Formats
 
-### `.passlock` (encrypted, default)
+### `.offvault` (encrypted, default)
 
 ```
 OFV_SYNC_V1
@@ -182,7 +178,7 @@ OFV_SYNC_V1
 
 Line 1 is the file header (used to detect file type without decrypting). Line 2 is the encrypted payload. The CSV payload once decrypted has columns: `key,password,description,createdAt,updatedAt`.
 
-### `.passlock` (xlsx variant, encrypted)
+### `.offvault` (xlsx variant, encrypted)
 
 ```
 OFV_SYNC_XLSX_V1
@@ -195,7 +191,7 @@ The XLSX spreadsheet is built in-memory, base64-encoded, then encrypted as above
 
 **Raw export:** standard comma-separated text with the header row `key,password,description,createdAt,updatedAt`. No encryption.
 
-**Encrypted:** same format as `.passlock` but exported with a `.csv` extension — the file header `OFV_SYNC_V1` is still present on line 1 so OFFVAULT can auto-detect it on import.
+**Encrypted:** same format as `.offvault` but exported with a `.csv` extension — the file header `OFV_SYNC_V1` is still present on line 1 so OFFVAULT can auto-detect it on import.
 
 ### `.xlsx` (raw or encrypted)
 
@@ -224,7 +220,7 @@ On import, OFFVAULT peeks at the first 30 bytes of the file:
 ```
 User clicks Export
   → openExportModal()
-  → User selects Format (passlock / csv / xlsx) + Protection (Encrypted / Raw)
+  → User selects Format (OFFVAULT / csv / xlsx) + Protection (Encrypted / Raw)
   → submitIoModal() → handleExport()
     ├── [Encrypted] buildExportContent(format, secretKey, masterPassword)
     │     → derive effectiveKey
